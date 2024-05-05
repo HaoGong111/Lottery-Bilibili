@@ -4,8 +4,14 @@ B站转发动态抽奖~半自动
 但是仍需要扫码登录，自己收集抽奖链接放到links.txt中***
 ### **特点**
 + 采用Python + Selenium模拟人为操作
-+ 可以抽官抽，非官抽，固定转赞评，评论内容在四条评论内随机选取，不会重复，避免触发机器验证。
++ 可以抽官抽，非官抽，固定转赞评，评论内容在五条评论内随机选取，不会重复，避免触发机器验证。
 + 为防止被检测，采用大量等待，每条耗时5-15s之间
-### 说在后面
-首先运行get_cookies.py这个文件获取自己的B站Cookie，整理好抽奖链接放到links.txt里就可以运行get_sups开始抽奖了。
-每次运行**get_sups.py**程序都会打开一个没有cookie数据的B站首页，**只能自己扫码登录，然后回到程序控制台输入回车（"Enter"一下）**。等以后研究一下怎么自动登录吧。
+### 使用方法
+1. 安装Python3.x，并安装selenium库
+```
+pip install selenium
+```
+2. 下载与chrome版本匹配的ChromeDriver，并将其放到Python安装目录下的Scripts文件夹中
+3. 运行get_cookies.py，登录B站账号，此时会生成cookies.txt文件
+4. 将抽奖链接放入links.txt中，每行一个链接
+5. 运行lottery.py，程序会自动开始抽奖
