@@ -1,6 +1,6 @@
 
 import random
-comment_box = ["来了来了[脱单doge]", 
+comments = ["来了来了[脱单doge]", 
             "就想简简单单中个奖QAQ",
             "啊啊啊啊啊, 让我中一次吧 T_T",
             "天选之子[doge]",
