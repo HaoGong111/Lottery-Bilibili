@@ -92,10 +92,25 @@ def official():
         time.sleep(7 * random.random())
 
 
+def reserve():
+    try:
+        browser.find_element(By.CLASS_NAME, "uncheck").click()
+        global num
+        num = num + 1
+        print(str(num)+"：已成功预约直播预约动态{}".format(url2id(url)))
+        return True
+    except:
+        return False
+    finally:
+        time.sleep(7 * random.random())
+
+
 def dynamic(url):
     browser.get(url)
     time.sleep(1+random.random())
     if official():
+        return
+    if reserve():
         return
     # 关注s
     profile = browser.find_element(By.CLASS_NAME, "bili-dyn-avatar")
