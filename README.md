@@ -12,6 +12,8 @@ B站转发动态抽奖~半自动
 pip install selenium
 ```
 2. 下载与chrome版本匹配的ChromeDriver，并将其放到Python安装目录下的Scripts文件夹中
-3. 运行get_cookies.py，登录B站账号，此时会生成cookies.txt文件
+   1. 较新版本Chrome:[Chrome for Testing availability](https://googlechromelabs.github.io/chrome-for-testing/)
+   2. [其他版本对应驱动](https://chromedriver.storage.googleapis.com/index.html)
+3. 运行get_cookies.py，登录B站账号，此时会生成cookies.json文件
 4. 将抽奖链接放入links.txt中，每行一个链接
 5. 运行lottery.py，程序会自动开始抽奖
