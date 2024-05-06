@@ -1,21 +1,26 @@
-
+import json
+import time
 import random
-comments = ["来了来了[脱单doge]", 
-            "就想简简单单中个奖QAQ",
-            "啊啊啊啊啊, 让我中一次吧 T_T",
-            "天选之子[doge]",
-            "好耶，感谢[星星眼][星星眼][星星眼]"]
-link_list=[]
-num=0
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from utils import read_urls, url2id
 
-
-def random_comment():
-    global comments
-    li = comments[:-1]
-    pick = random.choice(li)
-    idx = comments.index(pick)
-    comments[idx], comments[4] = comments[4], comments[idx]
-    return pick
-
-for i in range(10):
-    print(random_comment())
+options = Options()
+#options.add_argument("--headless")  # 不打开浏览器界面，以节省时间
+options.add_experimental_option(
+    "excludeSwitches", ["enable-automation", "enable-logging"]
+)
+browser = webdriver.Chrome(options=options)
+browser.get("https://t.bilibili.com/920923026455789587")
+# browser.get("https://t.bilibili.com/926028033187381272")
+try:
+    browser.find_element(By.CLASS_NAME, "reference")
+    print(True)
+except Exception as e:
+    print(e)
+    print(False)
+browser.close()

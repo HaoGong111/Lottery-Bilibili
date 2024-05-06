@@ -25,6 +25,10 @@ link_list=[]
 num=0
 
 
+def now_time():
+    return "\033[32m[" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "]\033[0m"
+
+
 def random_comment():
     global comments
     li = comments[:-1]
@@ -67,12 +71,13 @@ def check_origin_exists():
     是否存在动态引用
     """
     try:
-        browser.find_element(By.CLASS_NAME, "bili-dyn-content__orig reference")
+        browser.find_element(By.CLASS_NAME, "reference")
         return True
     except:
         return False
 
-def official():
+def official(has_reference:bool=False):
+    skip = False
     try:
         official_icon = browser.find_element(By.CSS_SELECTOR, ".bili-rich-text-module.lottery")
         official_icon.click()
@@ -84,12 +89,15 @@ def official():
         browser.switch_to.default_content()
         global num
         num = num + 1
-        print(str(num)+"：已成功转发official动态{}".format(url2id(url)))
-        return True
+        print("{} {}：已成功转发official动态{}".format(now_time(), num, url2id(url)))
+        skip = True
     except:
-        return False
+        skip = False
     finally:
+        if has_reference:
+            skip = False
         time.sleep(7 * random.random())
+        return skip
 
 
 def reserve():
@@ -97,7 +105,7 @@ def reserve():
         browser.find_element(By.CLASS_NAME, "uncheck").click()
         global num
         num = num + 1
-        print(str(num)+"：已成功预约直播预约动态{}".format(url2id(url)))
+        print("{} {}：已成功预约直播预约动态{}".format(now_time(), num, url2id(url)))
         return True
     except:
         return False
@@ -108,7 +116,9 @@ def reserve():
 def dynamic(url):
     browser.get(url)
     time.sleep(1+random.random())
-    if official():
+    has_reference = check_origin_exists()
+
+    if official(has_reference):
         return
     if reserve():
         return
@@ -145,7 +155,7 @@ def dynamic(url):
     browser.find_element(By.CLASS_NAME, "send-text").click()
     global num
     num = num + 1
-    print(str(num)+"：已成功转发动态{}".format(url2id(url)))
+    print("{} {}：已成功转发动态{}".format(now_time(), num, url2id(url)))
     time.sleep(7 * random.random())
 
 
@@ -162,7 +172,6 @@ if __name__ == "__main__":
             try:
                 dynamic(url)
             except Exception as e:
-                print(e)
                 continue
             note.write(id+'\n')
     note.close()
