@@ -66,7 +66,7 @@ def gethtml():
     browser.get(url)
     time.sleep(3)
 
-def check_origin_exists():
+def is_reference():
     """
     是否存在动态引用
     """
@@ -76,10 +76,49 @@ def check_origin_exists():
     except:
         return False
 
-def official(has_reference:bool=False):
-    skip = False
+def is_official():
     try:
         official_icon = browser.find_element(By.CSS_SELECTOR, ".bili-rich-text-module.lottery")
+        return official_icon
+    except:
+        return None
+
+def is_reserve():
+    try:
+        reserve_icon = browser.find_element(By.CLASS_NAME, "uncheck")
+        return reserve_icon
+    except:
+        return None
+
+
+def do_reference():
+    """转发加码动态
+    """
+    try:
+        do_follow()
+        forward_icon = browser.find_element(By.CSS_SELECTOR, ".side-toolbar__action.forward")
+        forward_icon.click()
+        time.sleep(1)
+        textarea = browser.find_element(By.CLASS_NAME, "bili-rich-textarea__inner")
+        # 使用js修改文本内容
+        comment = random_comment()
+        script = "arguments[0].childNodes[0].textContent = '\u200b' + '{}' + arguments[0].childNodes[0].textContent".format(comment)
+        browser.execute_script(script, textarea)
+        # 发布
+        browser.find_element(By.CLASS_NAME, "bili-dyn-share-publishing__action").click()
+        do_comment(False)
+        global num
+        num = num + 1
+        print("{} {}：已成功转发动态{}".format(now_time(), num, url2id(url)))
+        time.sleep(7 * random.random())
+    except:
+        print("{} {}：转发动态{}失败".format(now_time(), num, url2id(url)))
+
+
+def do_official(official_icon):
+    if official_icon is None:
+        return
+    try:
         official_icon.click()
         iframe = browser.find_element(By.CLASS_NAME, 'bili-popup__content__browser')
         browser.switch_to.frame(iframe)
@@ -90,46 +129,22 @@ def official(has_reference:bool=False):
         global num
         num = num + 1
         print("{} {}：已成功转发official动态{}".format(now_time(), num, url2id(url)))
-        skip = True
-    except:
-        skip = False
-    finally:
-        if has_reference:
-            skip = False
         time.sleep(7 * random.random())
-        return skip
+    except:
+        print("{} {}：转发official动态{}失败".format(now_time(), num, url2id(url)))
 
 
-def reserve():
+def do_reserve(reserve_icon):
     try:
-        browser.find_element(By.CLASS_NAME, "uncheck").click()
+        reserve_icon.click()
         global num
         num = num + 1
         print("{} {}：已成功预约直播预约动态{}".format(now_time(), num, url2id(url)))
-        return True
-    except:
-        return False
-    finally:
         time.sleep(7 * random.random())
+    except:
+        print("{} {}：预约直播预约动态{}失败".format(now_time(), num, url2id(url)))
 
-
-def dynamic(url):
-    browser.get(url)
-    time.sleep(1+random.random())
-    has_reference = check_origin_exists()
-
-    if official(has_reference):
-        return
-    if reserve():
-        return
-    # 关注s
-    profile = browser.find_element(By.CLASS_NAME, "bili-dyn-avatar")
-    ActionChains(browser).move_to_element(profile).perform()
-    time.sleep(1)
-    follow = browser.find_element(By.CSS_SELECTOR, ".bili-user-profile-view__info__button.follow")
-    if "checked" not in follow.get_attribute("class"):
-        follow.click()
-    
+def do_comment(sync_to_dyn: bool = False):
     # 鼠标移向别处
     other_place = browser.find_element(By.XPATH, '//*[@id="nav-searchform"]/div[1]/input')
     ActionChains(browser).move_to_element(other_place).perform()
@@ -147,12 +162,40 @@ def dynamic(url):
     browser.find_element(By.CLASS_NAME, "reply-box-textarea").click()
     time.sleep(1)
     browser.switch_to.active_element.send_keys(random_comment())
-    # 勾选 同时转发到我动态
-    browser.find_element(By.ID, "forwardToDynamic").click()
+    if sync_to_dyn:
+        # 勾选 同时转发到我动态
+        browser.find_element(By.ID, "forwardToDynamic").click()
     
     time.sleep(1)
     # 发表评论
     browser.find_element(By.CLASS_NAME, "send-text").click()
+
+def do_follow():
+    # 关注
+    profile = browser.find_element(By.CLASS_NAME, "bili-dyn-avatar")
+    ActionChains(browser).move_to_element(profile).perform()
+    time.sleep(1)
+    follow = browser.find_element(By.CSS_SELECTOR, ".bili-user-profile-view__info__button.follow")
+    if "checked" not in follow.get_attribute("class"):
+        follow.click()
+
+def dynamic(url):
+    browser.get(url)
+    time.sleep(1+random.random())
+    has_ref = is_reference()
+    official_icon = is_official()
+    reserve_icon = is_reserve()
+    if is_reserve():
+        do_reserve(reserve_icon)
+        return
+    if has_ref:
+        do_reference()
+        return
+    elif official_icon:
+        do_official(official_icon)
+        return
+    do_follow()
+    do_comment(True)
     global num
     num = num + 1
     print("{} {}：已成功转发动态{}".format(now_time(), num, url2id(url)))
